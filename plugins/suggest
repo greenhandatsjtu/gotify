@@ -1,0 +1,38 @@
+#!/usr/bin/python3
+
+import requests
+import random
+import json
+
+
+def main():
+    url = 'https://movie.douban.com/j/chart/top_list'
+    _type = random.randint(1, 25)
+    params = {
+        'type': _type,
+        'interval_id': '100:90',
+        'limit': 100
+    }
+    headers = {
+        "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 "
+                      "Safari/537.36",
+        "accept": "application/json"
+    }
+    try:
+        res = requests.get(url, params=params, headers=headers, timeout=5)
+    except:
+        return
+    movies = res.json()
+    length = len(movies)
+    if length==0:
+        return
+    _id = random.randint(0, length - 1)
+    movie = movies[_id]
+    print("<a href=\"{}\">{}</a>\n类型: {}\n评分: {}，排名{}\n上映日期: {}".format(movie['url'], movie['title'],
+                                                                        ' '.join(movie['types']),
+                                                                        movie['score'], movie['rank'],
+                                                                        movie['release_date']))
+
+
+if __name__ == '__main__':
+    main()

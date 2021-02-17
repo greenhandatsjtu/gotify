@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>管理界面</title>
+    <link href="https://cdn.bootcss.com/twitter-bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/bootstrap-table/1.16.0/bootstrap-table.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/font-awesome/5.12.1/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/toastr.js/2.1.4/toastr.css" rel="stylesheet">
+</head>
+<body style="font-size: 14px">
+<nav class="navbar navbar-expand-sm navbar-light bg-dark fixed-top">
+    <a class="navbar-brand" style="color:#aaaaaa">订阅通知系统管理页面</a>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <button id="reboot" class="btn btn-outline-info">
+        重启服务
+    </button>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <button id="quit" class="btn btn-outline-warning">
+        退出程序
+    </button>
+</nav>
+<br><br><br><br><br>
+<div class=" container-fluid container-sm">
+    <div id="toolbar">
+        <h3>爬虫源管理</h3>
+        <div class="btn-group">
+            <button id="sourceCreate" class="btn btn-primary" data-toggle="modal" data-target="#newSourceModal">新建
+            </button>
+            <button id="sourceDisable" class="btn btn-info">禁用</button>
+        </div>
+    </div>
+    <table
+            id="table"
+            data-toolbar="#toolbar"
+            data-search="true"
+            data-show-refresh="true"
+            data-show-toggle="true"
+            data-detail-formatter="detailFormatter"
+            data-show-pagination-switch="true"
+            data-pagination="true"
+            data-id-field="id"
+            data-page-list="[10, 25, 50, 100, all]"
+            data-side-pagination="client"
+            data-url="/sources"
+            class="table  table-striped table-responsive-sm">
+        <thead>
+        <tr>
+            <th data-field="ID" data-title="ID" data-sortable="true">ID</th>
+            <th data-field="operate" data-title="操作" data-events="window.operateEvents"
+                data-formatter="operateFormatter"></th>
+            <th data-field="name" data-title="名字">名字</th>
+            <th data-field="url" data-title="url" data-sortable="true">url</th>
+<!--            {{/*            <th data-field="base_url" data-title="base url" data-sortable="true">base url</th>*/}}-->
+<!--            {{/*            <th data-field="block" data-title="block" data-sortable="true">block</th>*/}}-->
+<!--            {{/*            <th data-field="title" data-title="标题" data-sortable="true">标题</th>*/}}-->
+<!--            {{/*            <th data-field="href" data-title="超链接" data-sortable="true">超链接</th>*/}}-->
+            <th data-field="frequency" data-title="更新频率" data-sortable="true">更新频率</th>
+            <th data-field="enabled" data-title="启用" data-formatter="enabledFormatter">启用</th>
+        </tr>
+        </thead>
+    </table>
+    <div class="modal fade" id="newSourceModal" tabindex="-1" role="dialog" aria-hidden="true"
+         aria-describedby="newSourceModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="newSourceModalLabel">添加爬虫源</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-row">
+                            <div class="form-group col-sm-4">
+                                <label for="newSourceName">爬虫源名</label>
+                                <input type="text" class="form-control form-control-sm" id="newSourceName">
+                            </div>
+                            <div class="form-group col-sm-8">
+                                <label for="newSourceUrl">目标网页 URL</label>
+                                <input type="url" class="form-control form-control-sm" id="newSourceUrl">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <label for="newSourceBlock">block</label>
+                            <input type="text" class="form-control form-control-sm" id="newSourceBlock"
+                                   aria-describedby="newSourceBlockHelp">
+                            <small id="newSourceBlockHelp" class="form-text text-muted">能定位到包含标题和超链接的区块的CSS选择器</small>
+                        </div>
+                        <div class="form-row">
+                            <label for="html">html标签</label>
+                            <input type="text" class="form-control form-control-sm" id="html"
+                                   aria-describedby="htmlHelp">
+                            <small id="htmlHelp" class="form-text text-muted">目标消息所在的HTML标签</small>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-sm-3">
+                                <label for="newSourceFrequency">更新频率</label>
+                                <input type="number" class="form-control form-control-sm" id="newSourceFrequency"
+                                       aria-describedby="newSourceFrequencyHelp" min="1">
+                                <small id="newSourceFrequencyHelp" class="form-text text-muted">以分钟为单位</small>
+                            </div>
+                            <div class="col-sm-8"></div>
+                        </div>
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="newSourceEnable">
+                            <label class="custom-control-label" for="newSourceEnable">启用</label>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal" aria-label="Close">取消</button>
+                    <button type="button" class="btn btn-primary" id="newSourceOK" data-dismiss="modal">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="sourceModal" tabindex="-1" role="dialog" aria-hidden="true"
+         aria-describedby="sourceModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="sourceModalLabel">修改爬虫源</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <input type="hidden" id="sourceId">
+                        <div class="form-row">
+                            <div class="form-group col-sm-4">
+                                <label for="sourceName">爬虫源名</label>
+                                <input type="text" class="form-control form-control-sm" id="sourceName">
+                            </div>
+                            <div class="form-group col-sm-8">
+                                <label for="sourceUrl">目标网页 URL</label>
+                                <input type="url" class="form-control form-control-sm" id="sourceUrl">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-sm-7">
+                                <label for="sourceBlock">block</label>
+                                <input type="text" class="form-control form-control-sm" id="sourceBlock"
+                                       aria-describedby="sourceBlockHelp">
+                                <small id="sourceBlockHelp" class="form-text text-muted">能定位到包含标题和超链接的区块的CSS选择器</small>
+                            </div>
+                            <div class="form-group col-sm-5">
+                                <label for="sourceTitle">标题</label>
+                                <input type="text" class="form-control form-control-sm" id="sourceTitle"
+                                       aria-describedby="sourceTitleHelp">
+                                <small id="sourceTitleHelp" class="form-text text-muted">能定位到标题的CSS选择器</small>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-sm-8">
+                                <label for="baseUrl">base URL</label>
+                                <input type="url" class="form-control form-control-sm" id="baseUrl"
+                                       aria-describedby="baseUrlHelp">
+                                <small id="baseUrlHelp" class="form-text text-muted">超链接跳转所需要的前缀</small>
+                            </div>
+                            <div class="form-group col-sm-4">
+                                <label for="sourceHref">超链接</label>
+                                <input type="text" class="form-control form-control-sm" id="sourceHref"
+                                       aria-describedby="sourceHrefHelp">
+                                <small id="sourceHrefHelp" class="form-text text-muted">能定位到超链接的CSS选择器</small>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-sm-3">
+                                <label for="sourceFrequency">更新频率</label>
+                                <input type="number" class="form-control form-control-sm" id="sourceFrequency"
+                                       aria-describedby="sourceFrequencyHelp" min="1">
+                                <small id="sourceFrequencyHelp" class="form-text text-muted">以分钟为单位</small>
+                            </div>
+                            <div class="col-sm-8"></div>
+                        </div>
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="sourceEnable">
+                            <label class="custom-control-label" for="sourceEnable">启用</label>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal" aria-label="Close">取消</button>
+                    <button type="button" class="btn btn-primary" id="sourceOK" data-dismiss="modal">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="toolbar1">
+        <h3>RSS源管理</h3>
+        <div class="btn-group">
+            <button id="rssCreate" class="btn btn-primary" data-toggle="modal" data-target="#rssModal">新建</button>
+            <button id="rssDisable" class="btn btn-info">禁用</button>
+        </div>
+    </div>
+    <table
+            id="table1"
+            data-toolbar="#toolbar1"
+            data-search="true"
+            data-show-refresh="true"
+            data-show-toggle="true"
+            data-detail-formatter="detailFormatter"
+            data-show-pagination-switch="true"
+            data-pagination="true"
+            data-id-field="id"
+            data-page-list="[10, 25, 50, 100, all]"
+            data-side-pagination="client"
+            data-url="/rssSources"
+            class="table  table-striped table-responsive-sm">
+        <thead>
+        <tr>
+            <th data-field="ID" data-title="ID" data-sortable="true">ID</th>
+            <th data-field="operate" data-title="操作" data-events="window.operateEvents1"
+                data-formatter="operateFormatter"></th>
+            <th data-field="name" data-title="名字">名字</th>
+            <th data-field="url" data-title="url" data-sortable="true">url</th>
+            <th data-field="enabled" data-title="启用" data-formatter="enabledFormatter">启用</th>
+        </tr>
+        </thead>
+    </table>
+    <!-- Modal -->
+    <div class="modal fade" id="rssModal" tabindex="-1" role="dialog" aria-hidden="true"
+         aria-describedby="rssModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="rssModalLabel">添加/编辑RSS源</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <input type="hidden" id="rssId" value="">
+                        <div class="form-row">
+                            <div class="form-group col-sm-4">
+                                <label for="rssName">RSS名</label>
+                                <input type="text" class="form-control form-control-sm" id="rssName">
+                            </div>
+                            <div class="form-group col-sm-8">
+                                <label for="rssUrl">RSS订阅链接</label>
+                                <input type="url" class="form-control" id="rssUrl">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="custom-control custom-switch">
+                                <input type="checkbox" class="custom-control-input" id="rssEnable">
+                                <label class="custom-control-label" for="rssEnable">启用</label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal" aria-label="Close">取消</button>
+                    <button type="button" class="btn btn-primary" id="rssOK" data-dismiss="modal">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="toolbar2">
+        <h3>API源管理</h3>
+        <div class="btn-group">
+            <button id="jsonCreate" class="btn btn-primary" data-toggle="modal" data-target="#jsonModal">新建</button>
+            <button id="jsonDisable" class="btn btn-info">禁用</button>
+        </div>
+    </div>
+    <table
+            id="table2"
+            data-toolbar="#toolbar2"
+            data-search="true"
+            data-show-refresh="true"
+            data-show-toggle="true"
+            data-detail-formatter="detailFormatter"
+            data-show-pagination-switch="true"
+            data-pagination="true"
+            data-id-field="id"
+            data-page-list="[10, 25, 50, 100, all]"
+            data-side-pagination="client"
+            data-url="/jsonSources"
+            class="table  table-striped table-responsive-sm">
+        <thead>
+        <tr>
+            <th data-field="ID" data-title="ID" data-sortable="true">ID</th>
+            <th data-field="operate" data-title="操作" data-events="window.operateEvents2"
+                data-formatter="operateFormatter"></th>
+            <th data-field="name" data-title="名字">名字</th>
+            <th data-field="url" data-title="url" data-sortable="true">url</th>
+<!--                        <th data-field="base_url" data-title="base url" data-sortable="true">base url</th>-->
+<!--            {{/*            <th data-field="block" data-title="block" data-sortable="true">block</th>*/}}-->
+<!--            {{/*            <th data-field="title" data-title="标题" data-sortable="true">标题</th>*/}}-->
+<!--            {{/*            <th data-field="message" data-title="内容" data-sortable="true">内容</th>*/}}-->
+<!--            {{/*            <th data-field="href" data-title="超链接" data-sortable="true">超链接</th>*/}}-->
+            <th data-field="frequency" data-title="更新频率" data-sortable="true">更新频率</th>
+<!--            {{/*            <th data-field="mark" data-title="标记" data-sortable="true">标记</th>*/}}-->
+            <th data-field="login" data-title="需要登录" data-formatter="enabledFormatter"></th>
+            <th data-field="enabled" data-title="启用" data-sortable="true" data-formatter="enabledFormatter">启用</th>
+        </tr>
+        </thead>
+    </table>
+    <div class="modal fade" id="jsonModal" tabindex="-1" role="dialog" aria-hidden="true"
+         aria-describedby="jsonModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="jsonModalLabel">添加/修改json源</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <input type="hidden" id="jsonId">
+                        <div class="form-row">
+                            <div class="form-group col-sm-4">
+                                <label for="jsonName">json名</label>
+                                <input type="text" class="form-control form-control-sm" id="jsonName">
+                            </div>
+                            <div class="form-group col-sm-8">
+                                <label for="jsonUrl">json源URL</label>
+                                <input type="url" class="form-control form-control-sm" id="jsonUrl">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-sm-5">
+                                <label for="jsonBlock">block</label>
+                                <input type="text" class="form-control form-control-sm" id="jsonBlock"
+                                       aria-describedby="jsonBlockHelp">
+                                <small id="jsonBlockHelp" class="form-text text-muted">能定位到包含标题和超链接的区块的键值</small>
+                            </div>
+                            <div class="form-group col-sm-4">
+                                <label for="jsonTitle">标题</label>
+                                <input type="text" class="form-control form-control-sm" id="jsonTitle"
+                                       aria-describedby="jsonTitleHelp">
+                                <small id="jsonTitleHelp" class="form-text text-muted">能定位到标题的键值</small>
+                            </div>
+                            <div class="form-group col-sm-3">
+                                <label for="jsonMessage">内容</label>
+                                <input type="text" class="form-control form-control-sm" id="jsonMessage"
+                                       aria-describedby="jsonMessageHelp" min="1">
+                                <small id="jsonMessageHelp" class="form-text text-muted">能定位到内容的键值</small>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-sm-6">
+                                <label for="jsonBaseUrl">base URL</label>
+                                <input type="url" class="form-control form-control-sm" id="jsonBaseUrl"
+                                       aria-describedby="jsonBaseUrlHelp">
+                                <small id="jsonBaseUrlHelp" class="form-text text-muted">超链接跳转所需要的前缀</small>
+                            </div>
+                            <div class="form-group col-sm-3">
+                                <label for="jsonHref">超链接</label>
+                                <input type="text" class="form-control form-control-sm" id="jsonHref"
+                                       aria-describedby="jsonHrefHelp">
+                                <small id="jsonHrefHelp" class="form-text text-muted">能定位到超链接的键值</small>
+                            </div>
+                            <div class="form-group col-sm-3">
+                                <label for="jsonMark">标记</label>
+                                <input type="text" class="form-control form-control-sm" id="jsonMark"
+                                       aria-describedby="jsonMarkHelp" min="1">
+                                <small id="jsonMarkHelp" class="form-text text-muted">能定位到标记的键值</small>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-sm-2">
+                                <label for="jsonFrequency">更新频率</label>
+                                <input type="number" class="form-control form-control-sm" id="jsonFrequency"
+                                       aria-describedby="jsonFrequencyHelp" min="1">
+                                <small id="jsonFrequencyHelp" class="form-text text-muted">以分钟为单位</small>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-sm-3">
+                                <div class="custom-control custom-switch">
+                                    <input type="checkbox" class="custom-control-input" id="jsonLogin">
+                                    <label class="custom-control-label" for="jsonLogin">需要登录</label>
+                                </div>
+                            </div>
+                            <div class="form-group col-sm-2">
+                                <div class="custom-control custom-switch">
+                                    <input type="checkbox" class="custom-control-input" id="jsonEnable">
+                                    <label class="custom-control-label" for="jsonEnable">启用</label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal" aria-label="Close">取消</button>
+                    <button type="button" class="btn btn-primary" id="jsonOK" data-dismiss="modal">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="pluginToolbar">
+        <h3>插件管理</h3>
+        <div class="btn-group">
+            <button id="pluginCreate" class="btn btn-primary" data-toggle="modal" data-target="#pluginModal">新建</button>
+            <button id="pluginDisable" class="btn btn-info">禁用</button>
+        </div>
+    </div>
+    <table
+            id="pluginTable"
+            data-toolbar="#pluginToolbar"
+            data-search="true"
+            data-show-refresh="true"
+            data-show-toggle="true"
+            data-detail-formatter="detailFormatter"
+            data-show-pagination-switch="true"
+            data-pagination="true"
+            data-id-field="id"
+            data-page-list="[10, 25, 50, 100, all]"
+            data-side-pagination="client"
+            data-url="/plugins"
+            class="table  table-striped table-responsive-sm">
+        <thead>
+        <tr>
+            <th data-field="ID" data-title="ID" data-sortable="true">ID</th>
+            <th data-field="operate" data-title="操作" data-events="window.pluginOperateEvents"
+                data-formatter="operateFormatter"></th>
+            <th data-field="name" data-title="插件名">插件名</th>
+            <th data-field="exec" data-title="脚本名">脚本名</th>
+            <th data-field="frequency" data-title="更新频率" data-sortable="true">更新频率</th>
+            <th data-field="enabled" data-title="启用" data-sortable="true" data-formatter="enabledFormatter">启用</th>
+        </tr>
+        </thead>
+    </table>
+    <div class="modal fade" id="pluginModal" tabindex="-1" role="dialog" aria-hidden="true"
+         aria-describedby="pluginModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="pluginModalLabel">添加/修改插件</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <input type="hidden" id="pluginId">
+                        <div class="form-row">
+                            <div class="form-group col-sm-5">
+                                <label for="pluginName">插件名</label>
+                                <input type="text" class="form-control form-control-sm" id="pluginName">
+                            </div>
+                            <div class="form-group col-sm-7">
+                                <label for="pluginExec">脚本名</label>
+                                <input type="text" class="form-control form-control-sm" id="pluginExec"
+                                       aria-describedby="pluginExecHelp">
+                                <small id="pluginExecHelp" class="form-text text-muted">插件需要执行的脚本名</small>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-sm-6">
+                                <label for="pluginFrequency">更新频率</label>
+                                <input type="number" class="form-control form-control-sm" id="pluginFrequency"
+                                       aria-describedby="pluginFrequencyHelp" min="1">
+                                <small id="pluginFrequencyHelp" class="form-text text-muted">以分钟为单位</small>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-sm-4">
+                                <div class="custom-control custom-switch">
+                                    <input type="checkbox" class="custom-control-input" id="pluginEnable">
+                                    <label class="custom-control-label" for="pluginEnable">启用</label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal" aria-label="Close">取消</button>
+                    <button type="button" class="btn btn-primary" id="pluginOK" data-dismiss="modal">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/twitter-bootstrap/4.4.1/js/bootstrap.min.js"></script>
+<script src="https://cdn.bootcss.com/TableExport/5.2.0/js/tableexport.min.js"></script>
+<script src="https://cdn.bootcss.com/bootstrap-table/1.16.0/bootstrap-table.min.js"></script>
+<script src="https://cdn.bootcss.com/bootstrap-table/1.16.0/bootstrap-table-locale-all.min.js"></script>
+<script src="https://cdn.bootcss.com/bootstrap-table/1.16.0/extensions/export/bootstrap-table-export.min.js"></script>
+<script src="https://cdn.bootcss.com/toastr.js/2.1.4/toastr.min.js"></script>
+<script>
+    $("#quit").click(function () {
+        $.ajax({
+            type: 'GET',
+            url: '/quit',
+            success: function () {
+                toastr["warning"]("退出程序中...");
+            },
+            error: function () {
+                toastr["error"]("出现了一些问题...");
+            }
+        });
+    });
+
+    $("#reboot").click(function () {
+        console.log("rebooting...");
+        $.ajax({
+            type: 'GET',
+            url: '/reboot',
+            success: function () {
+                toastr["info"]("重启服务中...");
+            },
+            error: function () {
+                toastr["error"]("出现了一些问题...");
+            }
+        });
+    });
+
+    var $table = $('#table');
+    var $create = $('#sourceCreate');
+
+    var $table1 = $("#table1");
+    var $create1 = $('#rssCreate');
+
+    var $table2 = $("#table2");
+    var $create2 = $('#jsonCreate');
+
+    var $pluginTable = $("#pluginTable");
+    var $pluginCreate = $("#pluginCreate");
+
+    toastr.options = {
+        "closeButton": false,
+        "debug": false,
+        "newestOnTop": true,
+        "progressBar": true,
+        "positionClass": "toast-bottom-left",
+        "preventDuplicates": false,
+        "onclick": null,
+        "showDuration": "300",
+        "hideDuration": "1000",
+        "timeOut": "5000",
+        "extendedTimeOut": "1000",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
+    };
+
+    // 每次打开modal前执行初始化操作
+    $('#newSourceModal').on('show.bs.modal', function (event) {
+        $("#newSourceUrl").val("");
+        $("#newSourceName").val("");
+        $("#newSourceBlock").val("");
+        $("#html").val("");
+        $("#newSourceFrequency").val("10");
+        $("#newSourceEnable").prop("checked", false);
+    });
+    $('#sourceModal').on('show.bs.modal', function (event) {
+        $("#sourceId").val("");
+        $("#sourceName").val("");
+        $("#sourceUrl").val("");
+        $("#sourceBlock").val("");
+        $("#sourceTitle").val("");
+        $("#baseUrl").val("");
+        $("#sourceHref").val("");
+        $("#sourceFrequency").val("10");
+        $("#sourceEnable").prop("checked", false);
+    });
+    $('#rssModal').on('show.bs.modal', function (event) {
+        $("#rssId").val("");
+        $("#rssName").val("");
+        $("#rssUrl").val("");
+        $("#rssEnable").prop("checked", false);
+    });
+    $('#jsonModal').on('show.bs.modal', function (event) {
+        $("#jsonId").val("");
+        $("#jsonName").val("");
+        $("#jsonUrl").val("");
+        $("#jsonBaseUrl").val("");
+        $("#jsonBlock").val("");
+        $("#jsonTitle").val("");
+        $("#jsonMessage").val("");
+        $("#jsonHref").val("");
+        $("#jsonFrequency").val("10");
+        $("#jsonMark").val("");
+        $("#jsonLogin").prop("checked", false);
+        $("#jsonEnable").prop("checked", false);
+    });
+    $('#pluginModal').on('show.bs.modal', function (event) {
+        $("#pluginId").val("");
+        $("#pluginName").val("");
+        $("#pluginExec").val("");
+        $("#pluginFrequency").val("10");
+        $("#pluginEnable").prop("checked", false);
+    });
+
+    $("#newSourceOK").click(function () {
+        $.ajax({
+            type: 'POST',
+            url: '/source',
+            data: {
+                url: $("#newSourceUrl").val(),
+                name: $("#newSourceName").val(),
+                block: $("#newSourceBlock").val(),
+                html: $("#html").val(),
+                frequency: $("#newSourceFrequency").val(),
+                enabled: $("#newSourceEnable").prop("checked"),
+            },
+            success: function () {
+                toastr["success"]("成功添加爬虫源");
+                $('#table').bootstrapTable('refresh');
+            },
+            error: function () {
+                toastr["error"]("出现了一些问题...");
+            }
+        });
+    });
+
+    $("#sourceOK").click(function () {
+        $.ajax({
+            type: 'POST',
+            url: '/source/' + $("#sourceId").val(),
+            data: {
+                name: $("#sourceName").val(),
+                url: $("#sourceUrl").val(),
+                base_url: $("#baseUrl").val(),
+                block: $("#sourceBlock").val(),
+                title: $("#sourceTitle").val(),
+                href: $("#sourceHref").val(),
+                frequency: $("#sourceFrequency").val(),
+                enabled: $("#sourceEnable").prop("checked"),
+            },
+            success: function () {
+                if ($("#sourceId").val() === "") {
+                    toastr["success"]("成功添加爬虫源");
+                } else {
+                    toastr["info"]("成功修改爬虫源");
+                }
+                $('#table').bootstrapTable('refresh');
+            },
+            error: function () {
+                toastr["error"]("出现了一些问题...");
+            }
+        });
+    });
+
+    $("#rssOK").click(function () {
+        $.ajax({
+            type: 'POST',
+            url: '/rssSource/' + $("#rssId").val(),
+            data: {
+                name: $("#rssName").val(),
+                url: $("#rssUrl").val(),
+                enabled: $("#rssEnable").prop("checked")
+            },
+            success: function () {
+                if ($("#rssId").val() === "") {
+                    toastr["success"]("成功添加RSS源");
+                } else {
+                    toastr["info"]("成功修改RSS源");
+                }
+                $('#table1').bootstrapTable('refresh');
+            },
+            error: function () {
+                toastr["error"]("出现了一些问题...");
+            }
+        });
+    });
+
+    $("#jsonOK").click(function () {
+        $.ajax({
+            type: 'POST',
+            url: '/jsonSource/' + $("#jsonId").val(),
+            data: {
+                name: $("#jsonName").val(),
+                url: $("#jsonUrl").val(),
+                base_url: $("#jsonBaseUrl").val(),
+                block: $("#jsonBlock").val(),
+                title: $("#jsonTitle").val(),
+                message: $("#jsonMessage").val(),
+                href: $("#jsonHref").val(),
+                mark: $("#jsonMark").val(),
+                frequency: $("#jsonFrequency").val(),
+                login: $("#jsonLogin").prop("checked"),
+                enabled: $("#jsonEnable").prop("checked"),
+            },
+            success: function () {
+                if ($("#jsonId").val() === "") {
+                    toastr["success"]("成功添加json源");
+                } else {
+                    toastr["info"]("成功修改json源");
+                }
+                $('#table2').bootstrapTable('refresh');
+            },
+            error: function () {
+                toastr["error"]("出现了一些问题...");
+            }
+        });
+    });
+
+    $("#pluginOK").click(function () {
+        $.ajax({
+            type: 'POST',
+            url: '/plugin/' + $("#pluginId").val(),
+            data: {
+                name: $("#pluginName").val(),
+                exec: $("#pluginExec").val(),
+                frequency: $("#pluginFrequency").val(),
+                enabled: $("#pluginEnable").prop("checked")
+            },
+            success: function () {
+                if ($("#pluginId").val() === "") {
+                    toastr["success"]("成功添加插件");
+                } else {
+                    toastr["info"]("成功修改插件");
+                }
+                $('#pluginTable').bootstrapTable('refresh');
+            },
+            error: function () {
+                toastr["error"]("出现了一些问题...");
+            }
+        });
+    });
+
+    $("#sourceDisable").click(function () {
+        $.ajax({
+            type: 'GET',
+            url: '/sourceDisable',
+            success: function (msg) {
+                toastr["info"](msg["msg"]);
+                $('#table').bootstrapTable('refresh');
+            },
+            error: function () {
+                toastr["error"]("出现了一些问题...");
+            }
+        });
+    });
+
+    $("#rssDisable").click(function () {
+        $.ajax({
+            type: 'GET',
+            url: '/rssSourceDisable',
+            success: function (msg) {
+                toastr["info"](msg["msg"]);
+                $('#table1').bootstrapTable('refresh');
+            },
+            error: function () {
+                toastr["error"]("出现了一些问题...");
+            }
+        });
+    });
+
+    $("#jsonDisable").click(function () {
+        $.ajax({
+            type: 'GET',
+            url: '/jsonSourceDisable',
+            success: function (msg) {
+                toastr["info"](msg["msg"]);
+                $('#table2').bootstrapTable('refresh');
+            },
+            error: function () {
+                toastr["error"]("出现了一些问题...");
+            }
+        });
+    });
+
+    $("#pluginDisable").click(function () {
+        $.ajax({
+            type: 'GET',
+            url: '/pluginDisable',
+            success: function (msg) {
+                toastr["info"](msg["msg"]);
+                $('#pluginTable').bootstrapTable('refresh');
+            },
+            error: function () {
+                toastr["error"]("出现了一些问题...");
+            }
+        });
+    });
+
+
+    function detailFormatter(index, row) {
+        var html = [];
+        $.each(row, function (key, value) {
+            html.push('<p><b>' + key + ':</b> ' + value + '</p>')
+        });
+        return html.join('')
+    }
+
+    function enabledFormatter(value, index, row) {
+        if (value) {
+            return '<i class="fa fa-check" style="color: forestgreen"></i>'
+        } else {
+            return '<i class="fa fa-times" style="color: red"></i>'
+        }
+    }
+
+    function operateFormatter(value, row, index) {
+        return [
+            '<a class="edit" href="javascript:void(0)" title="Edit">',
+            '<i class="fa fa-edit"></i>',
+            '</a>  ',
+            '<a class="remove" href="javascript:void(0)" title="Remove">',
+            '<i class="fa fa-trash"></i>',
+            '</a>'
+        ].join('')
+    }
+
+    window.operateEvents = {
+        'click .edit': function (e, value, row, index) {
+            $("#sourceModal").modal();
+            $("#sourceId").val(row.ID);
+            $("#sourceName").val(row.name);
+            $("#sourceUrl").val(row.url);
+            $("#baseUrl").val(row.base_url);
+            $("#sourceBlock").val(row.block);
+            $("#sourceTitle").val(row.title);
+            $("#sourceHref").val(row.href);
+            $("#sourceFrequency").val(row.frequency);
+            $("#sourceEnable").prop("checked", row.enabled);
+        },
+        'click .remove': function (e, value, row, index) {
+            $table.bootstrapTable('remove', {
+                field: 'ID',
+                values: [row.ID]
+            });
+            $.ajax({
+                type: 'GET',
+                url: '/source/' + row.ID,
+                success: function () {
+                    $('#table').bootstrapTable('refresh');
+                    toastr["info"]("成功移除爬虫源");
+                }
+            })
+        }
+    };
+
+    window.operateEvents1 = {
+        'click .edit': function (e, value, row, index) {
+            $("#rssModal").modal();
+            $("#rssId").val(row.ID);
+            $("#rssName").val(row.name);
+            $("#rssUrl").val(row.url);
+            $("#rssEnable").prop("checked", row.enabled);
+        },
+        'click .remove': function (e, value, row, index) {
+            $table1.bootstrapTable('remove', {
+                field: 'ID',
+                values: [row.ID]
+            });
+            $.ajax({
+                type: 'GET',
+                url: '/rssSource/' + row.ID,
+                success: function () {
+                    $('#table1').bootstrapTable('refresh');
+                    toastr["info"]("成功移除RSS源");
+                }
+            })
+        }
+    };
+
+    window.operateEvents2 = {
+        'click .edit': function (e, value, row, index) {
+            $("#jsonModal").modal();
+            $("#jsonId").val(row.ID);
+            $("#jsonName").val(row.name);
+            $("#jsonUrl").val(row.url);
+            $("#jsonBaseUrl").val(row.base_url);
+            $("#jsonBlock").val(row.block);
+            $("#jsonTitle").val(row.title);
+            $("#jsonHref").val(row.href);
+            $("#jsonMessage").val(row.message);
+            $("#jsonMark").val(row.mark);
+            $("#jsonFrequency").val(row.frequency);
+            $("#jsonLogin").prop("checked", row.login);
+            $("#jsonEnable").prop("checked", row.enabled);
+        },
+        'click .remove': function (e, value, row, index) {
+            $table2.bootstrapTable('remove', {
+                field: 'ID',
+                values: [row.ID]
+            });
+            $.ajax({
+                type: 'GET',
+                url: '/jsonSource/' + row.ID,
+                success: function () {
+                    $('#table2').bootstrapTable('refresh');
+                    toastr["success"]("成功移除json源");
+                }
+            })
+        }
+    };
+
+    window.pluginOperateEvents = {
+        'click .edit': function (e, value, row, index) {
+            $("#pluginModal").modal();
+            $("#pluginId").val(row.ID);
+            $("#pluginName").val(row.name);
+            $("#pluginExec").val(row.exec);
+            $("#pluginFrequency").val(row.frequency);
+            $("#pluginEnable").prop("checked", row.enabled);
+        },
+        'click .remove': function (e, value, row, index) {
+            $pluginTable.bootstrapTable('remove', {
+                field: 'ID',
+                values: [row.ID]
+            });
+            $.ajax({
+                type: 'GET',
+                url: '/plugin/' + row.ID,
+                success: function (msg) {
+                    $pluginTable.bootstrapTable('refresh');
+                    toastr["success"](msg['msg']);
+                },
+                error: function (msg) {
+                    toastr["success"](msg['msg']);
+                }
+            })
+        }
+    };
+
+    function initTable() {
+
+        $table.bootstrapTable('destroy').bootstrapTable({
+            // height: 550,
+            locale: "zh-CN",
+        })
+    }
+
+    function initTable1() {
+        $table1.bootstrapTable('destroy').bootstrapTable({
+            // height: 550,
+            locale: "zh-CN",
+        })
+    }
+
+    function initTable2() {
+
+        $table2.bootstrapTable('destroy').bootstrapTable({
+            // height: 550,
+            locale: "zh-CN",
+        })
+    }
+
+    function initPluginTable() {
+
+        $pluginTable.bootstrapTable('destroy').bootstrapTable({
+            // height: 550,
+            locale: "zh-CN",
+        })
+    }
+
+    $(function () {
+        initTable();
+        initTable1();
+        initTable2();
+        initPluginTable();
+    })
+</script>
+</html>

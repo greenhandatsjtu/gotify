@@ -1,0 +1,18 @@
+#!/usr/bin/python3
+import requests
+
+url = 'https://v1.hitokoto.cn/'
+params = {
+    #'c': 'a',
+    'charset': 'utf-8',
+    'encode': 'json'
+}
+if __name__ == '__main__':
+    try:
+        results = requests.get(url, params=params, timeout=5)
+        text = results.json()
+        hitokoto = text['hitokoto']
+        source = text['from']
+        print(hitokoto + '\n——' + source)
+    except:
+        pass
