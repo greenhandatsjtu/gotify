@@ -2,7 +2,7 @@ package utils
 
 import (
 	"github.com/gen2brain/beeep"
-	"github.com/greenhandatsjtu/notifier/models"
+	"github.com/greenhandatsjtu/gotify/models"
 	log "github.com/sirupsen/logrus"
 	"time"
 )

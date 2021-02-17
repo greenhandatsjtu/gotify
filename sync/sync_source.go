@@ -3,9 +3,9 @@ package sync
 import (
 	"github.com/PuerkitoBio/goquery"
 	"github.com/SlyMarbo/rss"
-	"github.com/greenhandatsjtu/notifier/database"
-	"github.com/greenhandatsjtu/notifier/models"
-	"github.com/greenhandatsjtu/notifier/utils"
+	"github.com/greenhandatsjtu/gotify/database"
+	"github.com/greenhandatsjtu/gotify/models"
+	"github.com/greenhandatsjtu/gotify/utils"
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 	"io/ioutil"

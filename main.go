@@ -2,12 +2,12 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/greenhandatsjtu/notifier/config"
-	"github.com/greenhandatsjtu/notifier/database"
-	_ "github.com/greenhandatsjtu/notifier/logs"
-	"github.com/greenhandatsjtu/notifier/models"
-	"github.com/greenhandatsjtu/notifier/routes"
-	"github.com/greenhandatsjtu/notifier/utils"
+	"github.com/greenhandatsjtu/gotify/config"
+	"github.com/greenhandatsjtu/gotify/database"
+	_ "github.com/greenhandatsjtu/gotify/logs"
+	"github.com/greenhandatsjtu/gotify/models"
+	"github.com/greenhandatsjtu/gotify/routes"
+	"github.com/greenhandatsjtu/gotify/utils"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/mitchellh/go-homedir"
 	log "github.com/sirupsen/logrus"

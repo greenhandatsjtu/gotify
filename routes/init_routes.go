@@ -2,8 +2,8 @@ package routes
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/greenhandatsjtu/notifier/controllers"
-	_ "github.com/greenhandatsjtu/notifier/statik"
+	"github.com/greenhandatsjtu/gotify/controllers"
+	_ "github.com/greenhandatsjtu/gotify/statik"
 	"github.com/rakyll/statik/fs"
 	log "github.com/sirupsen/logrus"
 	"net/http"

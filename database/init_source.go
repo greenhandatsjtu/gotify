@@ -2,7 +2,7 @@
 package database
 
 import (
-	"github.com/greenhandatsjtu/notifier/models"
+	"github.com/greenhandatsjtu/gotify/models"
 )
 
 //初始化订阅源（爬虫）

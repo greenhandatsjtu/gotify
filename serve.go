@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/greenhandatsjtu/notifier/config"
-	"github.com/greenhandatsjtu/notifier/database"
-	"github.com/greenhandatsjtu/notifier/models"
-	"github.com/greenhandatsjtu/notifier/sync"
-	"github.com/greenhandatsjtu/notifier/utils"
+	"github.com/greenhandatsjtu/gotify/config"
+	"github.com/greenhandatsjtu/gotify/database"
+	"github.com/greenhandatsjtu/gotify/models"
+	"github.com/greenhandatsjtu/gotify/sync"
+	"github.com/greenhandatsjtu/gotify/utils"
 	log "github.com/sirupsen/logrus"
 )
 

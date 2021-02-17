@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/greenhandatsjtu/notifier/database"
-	"github.com/greenhandatsjtu/notifier/models"
+	"github.com/greenhandatsjtu/gotify/database"
+	"github.com/greenhandatsjtu/gotify/models"
 	log "github.com/sirupsen/logrus"
 	"net/http"
 	"regexp"

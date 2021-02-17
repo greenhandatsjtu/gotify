@@ -1,8 +1,8 @@
 package config
 
 import (
-	"github.com/greenhandatsjtu/notifier/models"
-	"github.com/greenhandatsjtu/notifier/utils"
+	"github.com/greenhandatsjtu/gotify/models"
+	"github.com/greenhandatsjtu/gotify/utils"
 	"github.com/jinzhu/configor"
 	"github.com/mitchellh/go-homedir"
 	log "github.com/sirupsen/logrus"

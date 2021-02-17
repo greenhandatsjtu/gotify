@@ -1,8 +1,8 @@
 package database
 
 import (
-	"github.com/greenhandatsjtu/notifier/config"
-	"github.com/greenhandatsjtu/notifier/models"
+	"github.com/greenhandatsjtu/gotify/config"
+	"github.com/greenhandatsjtu/gotify/models"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"github.com/mitchellh/go-homedir"

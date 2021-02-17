@@ -1,4 +1,4 @@
-module github.com/greenhandatsjtu/notifier
+module github.com/greenhandatsjtu/gotify
 
 go 1.14
 
