@@ -11,20 +11,14 @@ import (
 
 // 初始化gin的路由
 func InitRoutes(quit, reboot chan bool) *gin.Engine {
-	//m := melody.New() //websocket库，已弃用
 	r := gin.Default()
-	//加载HTML文件
-	//r.LoadHTMLFiles(config.Config.Root + config.Config.Server.Static + config.Config.Server.Index)
 
 	statikFS, err := fs.New()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	r.StaticFS("/index", statikFS)
-	r.GET("/", func(c *gin.Context) {
-		c.Redirect(http.StatusPermanentRedirect, "/index")
-	})
+	r.GET("", gin.WrapH(http.FileServer(statikFS)))
 
 	r.GET("/ping", func(context *gin.Context) {
 		context.JSON(200, gin.H{"status": "OK"})
