@@ -1,6 +1,6 @@
-# gotify
+# gotify 
 
-Go协程驱动的自动化多源订阅通知系统
+![](images/logo.png)Go协程驱动的自动化多源订阅通知系统
 
 ## 介绍
 
