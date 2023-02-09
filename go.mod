@@ -6,7 +6,7 @@ require (
 	github.com/PuerkitoBio/goquery v1.5.1
 	github.com/SlyMarbo/rss v1.0.1
 	github.com/gen2brain/beeep v0.0.0-20200305193625-ff0f4a39397e
-	github.com/gin-gonic/gin v1.7.0
+	github.com/gin-gonic/gin v1.7.7
 	github.com/jinzhu/configor v1.1.1
 	github.com/jinzhu/gorm v1.9.12
 	github.com/kr/pretty v0.1.0 // indirect
