@@ -15,7 +15,6 @@ require (
 	github.com/sirupsen/logrus v1.5.0
 	github.com/stretchr/testify v1.5.1 // indirect
 	github.com/tidwall/gjson v1.9.3
-	golang.org/x/net v0.0.0-20200202094626-16171245cfb2
-	golang.org/x/sys v0.0.0-20200321134203-328b4cd54aae // indirect
+	golang.org/x/net v0.7.0
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 )
